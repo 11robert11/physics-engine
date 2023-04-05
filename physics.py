@@ -43,10 +43,4 @@ print(a.components.size)
 print(b.components.size)
 universes_bodies.append(a)
 ren = gui.Renderer()
-
-
-def top_level_functions(body):
-    return (f for f in body if isinstance(f, ast.FunctionDef))
-
-
-x = threading.Thread(target=ren.loop(), args=(1,))
+ren.loop()
