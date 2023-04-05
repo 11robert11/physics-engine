@@ -4,13 +4,9 @@ import threading
 import time
 from tkinter import *
 
-import hudfunctions
-
 Window_Width = 800
 
 Window_Height = 800
-
-callable_hud_functions = inspect.getmembers(hudfunctions, inspect.isfunction)
 
 
 def create_window():
