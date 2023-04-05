@@ -9,7 +9,6 @@ Window_Width = 800
 
 Window_Height = 800
 
-
 callable_hud_functions = inspect.getmembers(hudfunctions, inspect.isfunction)
 
 
@@ -41,7 +40,7 @@ class Renderer:
         self.window.title("sd")
 
         canvas = Canvas(self.window)
-        canvas.configure(bg="yellow", bd="-1")
+        canvas.configure(bg="white", bd="-1")
         canvas.pack(fill="both", expand=True)
         return canvas
 
@@ -49,10 +48,34 @@ class Renderer:
         self.canvas.update()
         # polygons_to_render = self.polygons.copy
         begin_draw_time = 1
+        endtime = 2
         td = 1
         canvas_object_ids = []
 
+        frames = 0
+        fps_sum = 0
+        avg_fps = 1
+        avg_fps_period = 5
+
+
+        target_fps = 10
+        def current_td():
+            return time.time() - begin_draw_time
+
         while True:
+            td = current_td()
+            left_over_frame_time = (1 / target_fps) - current_td()
+            if (left_over_frame_time >= 0):
+                time.sleep(left_over_frame_time)
+                continue
+
+            frames = frames + 1
+            fps_sum = fps_sum + (1 / td)
+            if frames % avg_fps_period == 0:
+                avg_fps = fps_sum / frames + 1
+                fps_sum = frames = 0
+
+
             begin_draw_time = time.time()
             # for p in polygons_to_render:
             #    self.canvas.delete(p)
@@ -60,31 +83,42 @@ class Renderer:
             # for p in polygons_to_render:
             #    pass
             v = 0
-            for y in range(0, 4):
+
+            for y in range(0, 1):
                 sides = []
-                for s in range(0, random.randint(3, 6)):
+
+
+
+
+
+
+                for s in range(0, random.randint(3, 4)):
                     v += 1
                     sides.append(random.randint(0, 800))
                     sides.append(random.randint(0, 800))
 
                 canvas_object_ids.append(
-                    self.canvas.create_polygon(sides, fill="", width=0, outline=_from_rgb(
+                    self.canvas.create_polygon(sides, fill="", width=15, outline=_from_rgb(
                         (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))))
-            canvas_object_ids.append(
-                self.canvas.create_text(0, 12, text="{:.2f}".format(1 / td), anchor=NW, fill="black", font=12))
-            canvas_object_ids.append(
-                self.canvas.create_text(0, 24, text=len(canvas_object_ids) - 1, anchor=NW, fill="black", font=12))
-            canvas_object_ids.append(
-                self.canvas.create_text(0, 36, text="verts: {}".format(v), anchor=NW, fill="black", font=12))
+
+            canvas_object_ids.append(self.canvas.create_text(0, 12, text="fps: {:.2f}".format(1 / td), anchor=NW, fill="red", font=12))
+            canvas_object_ids.append(self.canvas.create_text(0, 24, text="avg fps(per {}): {:.2f}".format(avg_fps_period, avg_fps), anchor=NW, fill="red", font=12))
+            canvas_object_ids.append(self.canvas.create_text(0, 36, text="{}".format(len(canvas_object_ids)), anchor=NW, fill="red", font=12))
+            canvas_object_ids.append(self.canvas.create_text(0, 48, text="verts: {}".format(v), anchor=NW, fill="red", font=12))
+            canvas_object_ids.append(self.canvas.create_text(0, 60, text="left over frame time: {}".format(left_over_frame_time), anchor=NW, fill="red", font=12))
+
+
+
             self.canvas.update()
 
             # Clear canvas objects
             while len(canvas_object_ids) > 0:
                 self.canvas.delete(canvas_object_ids.pop(0))
 
-            td = (time.time() - begin_draw_time)
+
+            endtime = time.time()
+
             # self.canvas.update()
-            time.sleep(0.01)
 
 
 # animate_ball(Animation_Window, Animation_canvas, Ball_min_movement, Ball_min_movement)
